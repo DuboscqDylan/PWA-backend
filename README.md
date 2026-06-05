@@ -21,7 +21,7 @@ npm install -D nodemon
 Prisma:
 ```bash 
    npm install @prisma/client dotenv
-   npx prisma init
+   npm install @prisma/adapter-pg pg
    npx prisma init
 ```
 

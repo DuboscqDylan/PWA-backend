@@ -4,8 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -13,10 +12,24 @@ datasource db {
 }
 
 model Song {
-  id     Int    @id @default(autoincrement())
-  name   String
-  artist String
-  genre  String
-  cover  String
-  year   Int
+  id          Int      @id @default(autoincrement())
+  name        String
+  genre       String
+  cover       String
+  album       String
+  releaseDate DateTime
+  rating      Float
+  duration    Int
+  plays       Int
+
+  artistId Int
+  artist   Artist @relation(fields: [artistId], references: [id])
+}
+
+model Artist {
+  id         Int    @id @default(autoincrement())
+  name       String @unique
+  artistSlug String @unique
+
+  songs Song[]
 }
