@@ -11,11 +11,18 @@ cd PWA-backend
 
 2. Instalar las dependencias:
 
+Express:
 ```bash  
 npm install
 npm install express
 npm install cors
 npm install -D nodemon
+```   
+Prisma:
+```bash 
+   npm install @prisma/client dotenv
+   npx prisma init
+   npx prisma init
 ```
 
 3. Ejecutar el servidor en modo desarrollo:
