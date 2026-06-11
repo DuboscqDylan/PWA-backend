@@ -1,0 +1,7 @@
+El modelo deberá tener como mínimo:
+● id
+● campos propios de la entidad
+● createdAt
+● updatedAt
+
+Habría que agregar entonces createdAt y updatedAt
