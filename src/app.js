@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import prisma from "./lib/prisma.js";
+import errorHandler from "./middlewares/errorHandler.js";
+import notFound from "./middlewares/notFound.js";
 
 const app = express();
 
@@ -11,34 +13,32 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
-app.get("/songs", async (req, res) => {
+app.get("/songs", async (req, res, next) => {
   try {
     const songs = await prisma.song.findMany();
     res.json(songs);
   } catch (error) {
-    console.error("Error en GET /songs:");
-    console.error(error);
-
-    res.status(500).json({
-      error: error.message,
-    });
+    next(error);
   }
 });
 
-app.get("/songs/:id", async (req, res) => {
+app.get("/songs/:id", async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const song = await prisma.song.findUnique({ where: { id } });
     if (!song) {
-      return res.status(404).json({ error: "Song not found" });
+      const error = new Error("Song not found");
+      error.statusCode = 404;
+
+      return next(error);
     }
     res.json(song);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+     next(error);
   }
 });
 
-app.post("/songs", async (req, res) => {
+app.post("/songs", async (req, res, next) => {
   try {
     const song = await prisma.song.create({
       data: {
@@ -47,11 +47,11 @@ app.post("/songs", async (req, res) => {
     });
     res.status(201).json(song);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+     next(error);
   }
 });
 
-app.put("/songs/:id", async (req, res) => {
+app.put("/songs/:id", async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const song = await prisma.song.update({
@@ -62,11 +62,11 @@ app.put("/songs/:id", async (req, res) => {
     });
     res.json(song);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+     next(error);
   }
 });
 
-app.delete("/songs/:id", async (req, res) => {
+app.delete("/songs/:id", async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     await prisma.song.delete({ where: { id } });
@@ -74,8 +74,10 @@ app.delete("/songs/:id", async (req, res) => {
       message: "Canción eliminada",
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+     next(error);
   }
 });
 
+app.use(notFound);
+app.use(errorHandler);
 export default app;
