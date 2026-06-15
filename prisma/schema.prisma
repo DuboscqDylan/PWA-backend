@@ -24,6 +24,7 @@ model Song {
 
   artistId Int
   artist   Artist @relation(fields: [artistId], references: [id])
+  favorites Favorite[]
 }
 
 model Artist {
@@ -32,4 +33,10 @@ model Artist {
   artistSlug String @unique
 
   songs Song[]
+}
+
+model Favorite {
+  id      Int  @id @default(autoincrement())
+  songId  Int
+  song    Song @relation(fields: [songId], references: [id])
 }
