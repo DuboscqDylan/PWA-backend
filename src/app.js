@@ -3,6 +3,7 @@ import cors from "cors";
 import prisma from "./lib/prisma.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import notFound from "./middlewares/notFound.js";
+import validateSong from "./middlewares/validateSong.js";
 
 const app = express();
 
@@ -38,7 +39,7 @@ app.get("/songs/:id", async (req, res, next) => {
   }
 });
 
-app.post("/songs", async (req, res, next) => {
+app.post("/songs", validateSong, async (req, res, next) => {
   try {
     const song = await prisma.song.create({
       data: {
@@ -51,7 +52,7 @@ app.post("/songs", async (req, res, next) => {
   }
 });
 
-app.put("/songs/:id", async (req, res, next) => {
+app.put("/songs/:id", validateSong, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const song = await prisma.song.update({
