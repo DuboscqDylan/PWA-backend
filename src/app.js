@@ -18,7 +18,7 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
-app.get("/api/songs", async (req, res, next) => {
+app.get("/songs", async (req, res, next) => {
   try {
     const songs = await prisma.song.findMany({
       include: { artist: true },
@@ -29,7 +29,7 @@ app.get("/api/songs", async (req, res, next) => {
   }
 });
 
-app.get("/api/songs/:id", async (req, res, next) => {
+app.get("/songs/:id", async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const song = await prisma.song.findUnique({
@@ -47,7 +47,7 @@ app.get("/api/songs/:id", async (req, res, next) => {
   }
 });
 
-app.post("/api/songs", validateSong, async (req, res, next) => {
+app.post("/songs", validateSong, async (req, res, next) => {
   try {
     const song = await prisma.song.create({
       data: { ...req.body },
@@ -58,7 +58,7 @@ app.post("/api/songs", validateSong, async (req, res, next) => {
   }
 });
 
-app.put("/api/songs/:id", validateSong, async (req, res, next) => {
+app.put("/songs/:id", validateSong, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const song = await prisma.song.update({
@@ -71,7 +71,7 @@ app.put("/api/songs/:id", validateSong, async (req, res, next) => {
   }
 });
 
-app.delete("/api/songs/:id", async (req, res, next) => {
+app.delete("/songs/:id", async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     await prisma.song.delete({ where: { id } });
@@ -81,7 +81,7 @@ app.delete("/api/songs/:id", async (req, res, next) => {
   }
 });
 
-app.get("/api/favorites", async (req, res, next) => {
+app.get("/favorites", async (req, res, next) => {
   try {
     const favorites = await prisma.favorite.findMany({
       select: { songId: true },
@@ -92,7 +92,7 @@ app.get("/api/favorites", async (req, res, next) => {
   }
 });
 
-app.post("/api/favorites", async (req, res, next) => {
+app.post("/favorites", async (req, res, next) => {
   const { songId } = req.body;
   if (!songId) {
     const err = new Error("songId required");
@@ -107,7 +107,7 @@ app.post("/api/favorites", async (req, res, next) => {
   }
 });
 
-app.delete("/api/favorites/:songId", async (req, res, next) => {
+app.delete("/favorites/:songId", async (req, res, next) => {
   const { songId } = req.params;
   try {
     await prisma.favorite.deleteMany({
