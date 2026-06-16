@@ -20,19 +20,39 @@ const prisma = new PrismaClient({
 async function main() {
   await prisma.artist.createMany({
     data: artists,
+    skipDuplicates: true,
   });
   const artistMap = Object.fromEntries(
     (await prisma.artist.findMany()).map((a) => [a.artistSlug, a.id]),
   );
+  const required = [
+    "name",
+    "genre",
+    "cover",
+    "album",
+    "duration",
+    "plays",
+    "rating",
+  ];
   for (const song of songs) {
     const { artistSlug, releaseDate, ...songData } = song;
 
+    const artistId = artistMap[artistSlug];
+
+    const data = {
+      ...songData,
+      releaseDate: new Date(releaseDate),
+      artistId,
+    };
+
+    console.log(JSON.stringify(data, null, 2));
+
     await prisma.song.create({
-      data: {
-        ...songData,
-        releaseDate: new Date(releaseDate),
-        artistId: artistMap[artistSlug],
-      },
+      data,
+    });
+
+    await prisma.song.create({
+      data,
     });
   }
 }
