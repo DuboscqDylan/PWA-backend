@@ -3,3 +3,6 @@ node_modules
 .env
 
 /src/generated/prisma
+/src/schema.prisma
+/src/package-lock.json
+/src/package.json

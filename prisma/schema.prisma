@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,24 +7,29 @@ datasource db {
 }
 
 model Song {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   genre       String
   cover       String
   album       String
-  releaseDate DateTime
-  rating      Float
+  artistId    Int
   duration    Int
   plays       Int
-
-  artistId Int
-  artist   Artist @relation(fields: [artistId], references: [id])
+  rating      Float
+  releaseDate DateTime
+  Favorite    Favorite[]
+  artist      Artist     @relation(fields: [artistId], references: [id])
 }
 
 model Artist {
   id         Int    @id @default(autoincrement())
   name       String @unique
   artistSlug String @unique
+  songs      Song[]
+}
 
-  songs Song[]
+model Favorite {
+  id     Int  @id @default(autoincrement())
+  songId Int
+  Song   Song @relation(fields: [songId], references: [id])
 }
