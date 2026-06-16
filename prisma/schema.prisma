@@ -17,7 +17,7 @@ model Song {
   plays       Int
   rating      Float
   releaseDate DateTime
-  Favorite    Favorite[]
+  favorites    Favorite[]
   artist      Artist     @relation(fields: [artistId], references: [id])
 }
 
@@ -30,6 +30,6 @@ model Artist {
 
 model Favorite {
   id     Int  @id @default(autoincrement())
-  songId Int
-  Song   Song @relation(fields: [songId], references: [id])
+  songId Int 
+  song   Song @relation(fields: [songId], references: [id])
 }
