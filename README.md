@@ -31,7 +31,7 @@ Prisma:
 Crear un archivo .env en la raíz del proyecto:
 
 ```bash 
-  DATABASE_URL="postgresql://neondb_owner:usuario:password@host:5432/database"
+  DATABASE_URL="postgresql://neondb_owner:xxxxxx:xxxxxx@host:5432/database"
 ```
 
 4. Generar el cliente Prisma:
@@ -48,7 +48,7 @@ Crear un archivo .env en la raíz del proyecto:
 6. Verificar que el servidor esté funcionando:
    
 ```bash  
-   http://localhost:3000/health
+   http://localhost:5000/health
 ```
 
 Respuesta esperada:
