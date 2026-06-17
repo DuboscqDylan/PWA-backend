@@ -85,20 +85,18 @@ app.delete("/songs/:id", async (req, res, next) => {
 });
 
 app.get("/favorites", async (req, res, next) => {
-  res.json([]);
-  /*  try {
+  try {
     const favorites = await prisma.favorite.findMany({
       select: { songId: true },
     });
     res.json(favorites.map(f => f.songId));
   } catch (error) {
     next(error);
-  } */
+  }
 });
 
 app.post("/favorites", async (req, res, next) => {
-  res.status(201).json({ success: true });
-  /*   const { songId } = req.body;
+  const { songId } = req.body;
   if (!songId) {
     const err = new Error("songId required");
     err.statusCode = 400;
@@ -109,12 +107,11 @@ app.post("/favorites", async (req, res, next) => {
     res.status(201).json({ success: true });
   } catch (error) {
     next(error);
-  } */
+  }
 });
 
 app.delete("/favorites/:songId", async (req, res, next) => {
-  res.json({ success: true });
-  /*   const { songId } = req.params;
+  const { songId } = req.params;
   try {
     await prisma.favorite.deleteMany({
       where: { songId: parseInt(songId) },
@@ -122,7 +119,7 @@ app.delete("/favorites/:songId", async (req, res, next) => {
     res.json({ success: true });
   } catch (error) {
     next(error);
-  } */
+  }
 });
 
 app.use(notFound);
