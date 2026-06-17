@@ -50,10 +50,6 @@ async function main() {
     await prisma.song.create({
       data,
     });
-
-    await prisma.song.create({
-      data,
-    });
   }
 }
 
