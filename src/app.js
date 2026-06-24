@@ -110,11 +110,41 @@ app.get("/favorites", auth, async (req, res, next) => {
 app.post("/favorites", auth, async (req, res, next) => {
   const { songId } = req.body;
   if (!songId) {
-    const err = new Error("songId required");
-    err.statusCode = 400;
-    return next(err);
+    return res.status(400).json({
+      success: false,
+      message: "songId required",
+    });
   }
   try {
+    const song = await prisma.song.findUnique({
+      where: {
+        id: songId,
+      },
+    });
+
+    if (!song) {
+      return res.status(404).json({
+        success: false,
+        message: "Canción no encontrada",
+      });
+    }
+
+    const existingFavorite = await prisma.favorite.findUnique({
+      where: {
+        userId_songId: {
+          userId: req.user.id,
+          songId,
+        },
+      },
+    });
+
+    if (existingFavorite) {
+      return res.status(409).json({
+        success: false,
+        message: "La canción ya está en favoritos",
+      });
+    }
+
     await prisma.favorite.create({
       data: {
         songId,
