@@ -3,10 +3,12 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import bcrypt from "bcrypt";
 import prisma from "./lib/prisma.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import notFound from "./middlewares/notFound.js";
 import validateSong from "./middlewares/validateSong.js";
+import validateRegister from "./middlewares/validateRegister.js";
 
 const app = express();
 
@@ -89,7 +91,7 @@ app.get("/favorites", async (req, res, next) => {
     const favorites = await prisma.favorite.findMany({
       select: { songId: true },
     });
-    res.json(favorites.map(f => f.songId));
+    res.json(favorites.map((f) => f.songId));
   } catch (error) {
     next(error);
   }
@@ -117,6 +119,51 @@ app.delete("/favorites/:songId", async (req, res, next) => {
       where: { songId: parseInt(songId) },
     });
     res.json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("auth/register", validateRegister, async (req, res, next) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Email ya registrado",
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        passwordHash,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    });
   } catch (error) {
     next(error);
   }
