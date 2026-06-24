@@ -208,6 +208,13 @@ app.post("auth/login", validateLogin, async (req, res, next) => {
   }
 });
 
+app.get("auth/me", auth, async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    data: req.user
+  })
+});
+
 app.use(notFound);
 app.use(errorHandler);
 
