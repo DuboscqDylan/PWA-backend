@@ -88,18 +88,26 @@ app.delete("/songs/:id", async (req, res, next) => {
   }
 });
 
-app.get("/favorites", async (req, res, next) => {
+app.get("/favorites", auth, async (req, res, next) => {
   try {
     const favorites = await prisma.favorite.findMany({
-      select: { songId: true },
+      where: {
+        userId: req.user.id,
+      },
+      include: {
+        song: true,
+      },
     });
-    res.json(favorites.map((f) => f.songId));
+    res.json({
+      success: true,
+      data: favorites.map((f) => f.song),
+    });
   } catch (error) {
     next(error);
   }
 });
 
-app.post("/favorites", async (req, res, next) => {
+app.post("/favorites", auth, async (req, res, next) => {
   const { songId } = req.body;
   if (!songId) {
     const err = new Error("songId required");
@@ -107,7 +115,12 @@ app.post("/favorites", async (req, res, next) => {
     return next(err);
   }
   try {
-    await prisma.favorite.create({ data: { songId } });
+    await prisma.favorite.create({
+      data: {
+        songId,
+        userId: req.user.id,
+      },
+    });
     res.status(201).json({ success: true });
   } catch (error) {
     next(error);
@@ -211,8 +224,8 @@ app.post("auth/login", validateLogin, async (req, res, next) => {
 app.get("auth/me", auth, async (req, res, next) => {
   res.status(200).json({
     success: true,
-    data: req.user
-  })
+    data: req.user,
+  });
 });
 
 app.use(notFound);
