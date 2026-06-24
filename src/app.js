@@ -9,6 +9,8 @@ import errorHandler from "./middlewares/errorHandler.js";
 import notFound from "./middlewares/notFound.js";
 import validateSong from "./middlewares/validateSong.js";
 import validateRegister from "./middlewares/validateRegister.js";
+import validateLogin from "./middlewares/validateLogin.js";
+import { generateToken } from "./utils/jws.js";
 
 const app = express();
 
@@ -162,6 +164,43 @@ app.post("auth/register", validateRegister, async (req, res, next) => {
         email: user.email,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("auth/login", validateLogin, async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Credenciales inválidas",
+      });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.passwordHash);
+
+    if (!validPassword) {
+      return res.status(401).json({
+        success: false,
+        message: "Credenciales inválidas",
+      });
+    }
+
+    const token = generateToken(user);
+
+    res.status(200).json({
+      success: true,
+      token,
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
       },
     });
   } catch (error) {
