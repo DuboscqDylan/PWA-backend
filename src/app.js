@@ -127,13 +127,33 @@ app.post("/favorites", auth, async (req, res, next) => {
   }
 });
 
-app.delete("/favorites/:songId", async (req, res, next) => {
+app.delete("/favorites/:songId", auth, async (req, res, next) => {
   const { songId } = req.params;
   try {
-    await prisma.favorite.deleteMany({
-      where: { songId: parseInt(songId) },
+    const favorite = await prisma.favorite.findFirst({
+      where: {
+        songId,
+        userId: req.user.id,
+      },
     });
-    res.json({ success: true });
+
+    if (!favorite) {
+      return res.status(404).json({
+        success: false,
+        message: "Favorito no encontrado",
+      });
+    }
+
+    await prisma.favorite.delete({
+      where: {
+        id: favorite.id,
+      },
+    });
+
+    res.status.json({
+      success: true,
+      message: "Favorito eliminado",
+    });
   } catch (error) {
     next(error);
   }
