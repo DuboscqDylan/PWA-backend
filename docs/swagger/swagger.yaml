@@ -1,0 +1,203 @@
+openapi: 3.0.0
+
+info:
+  title: PWA Music API
+  version: 1.0.0
+  description: API para la gestión de canciones y favoritos.
+
+servers:
+  - url: http://localhost:5000
+
+tags:
+  - name: Songs
+    description: Endpoints de canciones
+
+  - name: Favorites
+    description: Endpoints de favoritos
+
+paths:
+
+  /songs:
+    get:
+      tags:
+        - Songs
+      summary: Obtener todas las canciones
+      responses:
+        "200":
+          description: Lista de canciones
+
+    post:
+      tags:
+        - Songs
+      summary: Crear una canción
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SongInput"
+
+      responses:
+        "201":
+          description: Canción creada
+        "400":
+          description: Datos inválidos
+
+  /songs/{id}:
+    get:
+      tags:
+        - Songs
+      summary: Obtener una canción por ID
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Canción encontrada
+        "404":
+          description: Canción no encontrada
+
+    put:
+      tags:
+        - Songs
+      summary: Actualizar una canción
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SongInput"
+
+      responses:
+        "200":
+          description: Canción actualizada
+        "404":
+          description: Canción no encontrada
+
+    delete:
+      tags:
+        - Songs
+      summary: Eliminar una canción
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Canción eliminada
+        "404":
+          description: Canción no encontrada
+
+  /favorites:
+    get:
+      tags:
+        - Favorites
+      summary: Obtener favoritos
+      responses:
+        "200":
+          description: Lista de favoritos
+
+    post:
+      tags:
+        - Favorites
+      summary: Agregar favorito
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                songId:
+                  type: integer
+
+      responses:
+        "201":
+          description: Favorito agregado
+        "400":
+          description: songId requerido
+
+  /favorites/{songId}:
+    delete:
+      tags:
+        - Favorites
+      summary: Eliminar favorito
+
+      parameters:
+        - in: path
+          name: songId
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Favorito eliminado
+        "404":
+          description: Favorito no encontrado
+
+components:
+
+  schemas:
+
+    Song:
+
+      type: object
+
+      properties:
+
+        id:
+          type: integer
+
+        name:
+          type: string
+
+        genre:
+          type: string
+
+        cover:
+          type: string
+
+    SongInput:
+
+      type: object
+
+      required:
+        - name
+        - genre
+
+      properties:
+
+        name:
+          type: string
+          example: Bohemian Rhapsody
+
+        genre:
+          type: string
+          example: Rock
+
+        cover:
+          type: string
+          example: https://image.jpg
+
+        artistId:
+          type: integer
+          example: 1

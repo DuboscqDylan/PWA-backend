@@ -7,15 +7,17 @@ const options = {
     info: {
       title: "PWA Music API",
       version: "1.0.0",
+      description: "Documentación de la API",
     },
+    servers: [
+      {
+        url: "http://localhost:5000",
+      },
+    ],
   },
-  apis: [path.resolve("docs/swagger.yaml")],
+  apis: [path.resolve("docs/swagger/swagger.yaml")],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
-
-export default swaggerSpec;
-
-const swaggerSpec = swaggerJSDoc(options);
 
 export default swaggerSpec;
