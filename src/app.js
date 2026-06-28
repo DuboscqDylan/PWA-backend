@@ -11,6 +11,8 @@ import validateSong from "./middlewares/validateSong.js";
 import validateRegister from "./middlewares/validateRegister.js";
 import validateLogin from "./middlewares/validateLogin.js";
 import { generateToken } from "./utils/jws.js";
+import auth from "./middlewares/auth.js";
+
 
 const app = express();
 
@@ -189,7 +191,7 @@ app.delete("/favorites/:songId", auth, async (req, res, next) => {
   }
 });
 
-app.post("auth/register", validateRegister, async (req, res, next) => {
+app.post("/auth/register", validateRegister, async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
@@ -234,7 +236,7 @@ app.post("auth/register", validateRegister, async (req, res, next) => {
   }
 });
 
-app.post("auth/login", validateLogin, async (req, res, next) => {
+app.post("/auth/login", validateLogin, async (req, res, next) => { 
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
@@ -283,7 +285,7 @@ app.post("auth/login", validateLogin, async (req, res, next) => {
   }
 });
 
-app.get("auth/me", auth, async (req, res, next) => {
+app.get("/auth/me", auth, async (req, res, next) => { 
   res.status(200).json({
     success: true,
     data: req.user,
