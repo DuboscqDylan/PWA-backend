@@ -255,15 +255,27 @@ app.post("auth/login", validateLogin, async (req, res, next) => {
       });
     }
 
-    const token = generateToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        userId: user.id,
+      },
+    });
 
     res.status(200).json({
       success: true,
-      token,
       data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+        accessToken,
+        refreshToken,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
       },
     });
   } catch (error) {
@@ -276,6 +288,72 @@ app.get("auth/me", auth, async (req, res, next) => {
     success: true,
     data: req.user,
   });
+});
+
+app.post("/auth/logout", async (req, res, next) => {
+  const { refreshToken } = req.body;
+
+  try {
+    await prisma.refreshToken.deleteMany({
+      where: {
+        token: refreshToken,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/auth/refresh", async (req, res, next) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    return res.status(400).json({
+      success: false,
+      message: "Requiere refresh token",
+    });
+  }
+
+  try {
+    const storedToken = await prisma.refreshToken.findUnique({
+      where: {
+        token: refreshToken,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!storedToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token invalidoa",
+      });
+    }
+
+    if (storedToken.expiresAt < new Date()) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token expirado",
+      });
+    }
+
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    const accessToken = generateAccessToken(storedToken.user);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        accessToken,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.use(notFound);
