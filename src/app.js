@@ -11,11 +11,15 @@ import validateSong from "./middlewares/validateSong.js";
 import validateRegister from "./middlewares/validateRegister.js";
 import validateLogin from "./middlewares/validateLogin.js";
 import { generateToken } from "./utils/jws.js";
+import auth from "./middlewares/auth.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 
 const app = express();
 
 app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
   res.json({ ok: true });
@@ -25,6 +29,26 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
+/**
+ * @swagger
+ * /songs/{id}:
+ *   get:
+ *     summary: Obtener una canción por ID
+ *     tags:
+ *       - Songs
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la canción
+ *     responses:
+ *       200:
+ *         description: Canción encontrada.
+ *       404:
+ *         description: Canción no encontrada.
+ */
 app.get("/songs", async (req, res, next) => {
   try {
     const songs = await prisma.song.findMany({
