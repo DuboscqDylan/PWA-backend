@@ -184,7 +184,7 @@ app.delete("/favorites/:songId", auth, async (req, res, next) => {
       },
     });
 
-    res.status.json({
+    res.status(200).json({
       success: true,
       message: "Favorito eliminado",
     });
