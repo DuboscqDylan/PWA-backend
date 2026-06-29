@@ -10,14 +10,16 @@ import notFound from "./middlewares/notFound.js";
 import validateSong from "./middlewares/validateSong.js";
 import validateRegister from "./middlewares/validateRegister.js";
 import validateLogin from "./middlewares/validateLogin.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 import { generateAccessToken, generateRefreshToken } from "./utils/jwt.js";
 import auth from "./middlewares/auth.js";
-
 
 const app = express();
 
 app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
   res.json({ ok: true });
