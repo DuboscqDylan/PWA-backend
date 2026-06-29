@@ -1,160 +1,780 @@
+
 openapi: 3.0.0
 
 info:
   title: PWA Music API
   version: 1.0.0
-  description: API para la gestión de canciones y favoritos.
+  description: |
+    API REST para la gestión de canciones, favoritos y autenticación
+    mediante JWT.
 
 servers:
   - url: http://localhost:5000
+    description: Servidor Local
 
 tags:
   - name: Songs
-    description: Endpoints de canciones
+    description: Gestión de canciones
 
   - name: Favorites
-    description: Endpoints de favoritos
+    description: Gestión de favoritos
+
+  - name: Auth
+    description: Autenticación de usuarios
+
+security:
+  - bearerAuth: []
 
 paths:
 
   /songs:
+
     get:
       tags:
         - Songs
       summary: Obtener todas las canciones
+      description: Devuelve el listado completo de canciones.
+
       responses:
         "200":
           description: Lista de canciones
 
+          content:
+            application/json:
+              example:
+                - id: 1
+                  name: Bohemian Rhapsody
+                  genre: Rock
+                  cover: https://image.jpg
+                  artistId: 1
+
+                - id: 2
+                  name: Imagine
+                  genre: Rock
+                  cover: https://image2.jpg
+                  artistId: 2
+
+        "500":
+          description: Error interno del servidor
+
+          content:
+            application/json:
+              example:
+                message: Internal server error
+
     post:
       tags:
         - Songs
+
       summary: Crear una canción
+
       requestBody:
         required: true
+
         content:
           application/json:
+
             schema:
               $ref: "#/components/schemas/SongInput"
 
+            example:
+              name: Bohemian Rhapsody
+              genre: Rock
+              cover: https://image.jpg
+              artistId: 1
+
       responses:
+
         "201":
           description: Canción creada
+
+          content:
+            application/json:
+
+              example:
+                id: 10
+                name: Bohemian Rhapsody
+                genre: Rock
+                cover: https://image.jpg
+                artistId: 1
+
         "400":
           description: Datos inválidos
 
+          content:
+            application/json:
+
+              example:
+                message: Datos inválidos
+
+        "500":
+          description: Error interno
+
+          content:
+            application/json:
+
+              example:
+                message: Internal server error
+
   /songs/{id}:
+
     get:
       tags:
         - Songs
+
       summary: Obtener una canción por ID
 
       parameters:
         - in: path
           name: id
           required: true
+
           schema:
             type: integer
 
+          example: 1
+
       responses:
+
         "200":
           description: Canción encontrada
+
+          content:
+            application/json:
+
+              example:
+                id: 1
+                name: Bohemian Rhapsody
+                genre: Rock
+                cover: https://image.jpg
+                artistId: 1
+
         "404":
           description: Canción no encontrada
+
+          content:
+            application/json:
+
+              example:
+                message: Song not found
+
+        "500":
+          description: Error interno
+
+          content:
+            application/json:
+
+              example:
+                message: Internal server error
 
     put:
       tags:
         - Songs
+
       summary: Actualizar una canción
 
       parameters:
         - in: path
           name: id
           required: true
+
           schema:
             type: integer
 
+          example: 1
+
       requestBody:
         required: true
+
         content:
           application/json:
+
             schema:
               $ref: "#/components/schemas/SongInput"
 
+            example:
+              name: Imagine
+              genre: Rock
+              cover: https://image2.jpg
+              artistId: 2
+
       responses:
+
         "200":
           description: Canción actualizada
+
+          content:
+            application/json:
+
+              example:
+                id: 1
+                name: Imagine
+                genre: Rock
+                cover: https://image2.jpg
+                artistId: 2
+
+        "400":
+          description: Datos inválidos
+
+          content:
+            application/json:
+
+              example:
+                message: Datos inválidos
+
         "404":
           description: Canción no encontrada
+
+          content:
+            application/json:
+
+              example:
+                message: Song not found
+
+        "500":
+          description: Error interno
+
+          content:
+            application/json:
+
+              example:
+                message: Internal server error
 
     delete:
       tags:
         - Songs
+
       summary: Eliminar una canción
 
       parameters:
         - in: path
           name: id
           required: true
+
           schema:
             type: integer
 
+          example: 1
+
       responses:
+
         "200":
           description: Canción eliminada
+
+          content:
+            application/json:
+
+              example:
+                message: Canción eliminada
+
         "404":
           description: Canción no encontrada
 
+          content:
+            application/json:
+
+              example:
+                message: Song not found
+
+        "500":
+          description: Error interno
+
+          content:
+            application/json:
+
+              example:
+                message: Internal server error
+
   /favorites:
+
     get:
       tags:
         - Favorites
-      summary: Obtener favoritos
+
+      summary: Obtener favoritos del usuario
+      description: Devuelve todas las canciones favoritas del usuario autenticado.
+
+      security:
+        - bearerAuth: []
+
       responses:
+
         "200":
           description: Lista de favoritos
+
+          content:
+            application/json:
+
+              example:
+                success: true
+                data:
+                  - id: 1
+                    name: Bohemian Rhapsody
+                    genre: Rock
+                    cover: https://image.jpg
+                    artistId: 1
+
+                  - id: 5
+                    name: Imagine
+                    genre: Rock
+                    cover: https://image2.jpg
+                    artistId: 2
+
+        "401":
+          description: No autenticado
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Requiere token
+
+        "403":
+          description: Token inválido
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Token inválido o expirado
+
+        "500":
+          description: Error interno
+
+          content:
+            application/json:
+
+              example:
+                message: Internal server error
+
 
     post:
       tags:
         - Favorites
-      summary: Agregar favorito
+
+      summary: Agregar una canción a favoritos
+
+      security:
+        - bearerAuth: []
 
       requestBody:
         required: true
+
         content:
           application/json:
+
             schema:
               type: object
+
+              required:
+                - songId
+
               properties:
+
                 songId:
                   type: integer
 
+            example:
+              songId: 3
+
       responses:
+
         "201":
           description: Favorito agregado
+
+          content:
+            application/json:
+
+              example:
+                success: true
+
         "400":
           description: songId requerido
 
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: songId required
+
+        "401":
+          description: No autenticado
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Requiere token
+
+        "404":
+          description: Canción inexistente
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Canción no encontrada
+
+        "409":
+          description: La canción ya es favorita
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: La canción ya está en favoritos
+
+        "500":
+          description: Error interno
+
+          content:
+            application/json:
+
+              example:
+                message: Internal server error
+
+
   /favorites/{songId}:
+
     delete:
       tags:
         - Favorites
-      summary: Eliminar favorito
+
+      summary: Eliminar un favorito
+
+      security:
+        - bearerAuth: []
 
       parameters:
+
         - in: path
           name: songId
           required: true
+
           schema:
             type: integer
 
+          example: 3
+
       responses:
+
         "200":
           description: Favorito eliminado
+
+          content:
+            application/json:
+
+              example:
+                success: true
+                message: Favorito eliminado
+
+        "401":
+          description: No autenticado
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Requiere token
+
+        "403":
+          description: Token inválido
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Token inválido o expirado
+
         "404":
           description: Favorito no encontrado
 
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Favorito no encontrado
+
+        "500":
+          description: Error interno
+
+          content:
+            application/json:
+
+              example:
+                message: Internal server error
+
+  /auth/register:
+
+    post:
+      tags:
+        - Auth
+
+      summary: Registrar un usuario
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+
+            example:
+              name: Juan Perez
+              email: juan@email.com
+              password: "123456"
+
+      responses:
+
+        "201":
+          description: Usuario registrado correctamente
+
+          content:
+            application/json:
+
+              example:
+                success: true
+                data:
+                  id: 1
+                  name: Juan Perez
+                  email: juan@email.com
+                  createdAt: "2026-06-20T12:00:00.000Z"
+                  updatedAt: "2026-06-20T12:00:00.000Z"
+
+        "400":
+          description: Datos inválidos
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Datos inválidos
+
+        "409":
+          description: Email ya registrado
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Email ya registrado
+
+        "500":
+          description: Error interno del servidor
+
+
+
+  /auth/login:
+
+    post:
+      tags:
+        - Auth
+
+      summary: Iniciar sesión
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+
+            example:
+              email: juan@email.com
+              password: "123456"
+
+      responses:
+
+        "200":
+          description: Login exitoso
+
+          content:
+            application/json:
+
+              example:
+                success: true
+                data:
+                  accessToken: eyJhbGciOi...
+                  refreshToken: eyJhbGciOi...
+                  user:
+                    id: 1
+                    name: Juan Perez
+                    email: juan@email.com
+
+        "401":
+          description: Credenciales inválidas
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Credenciales inválidas
+
+        "500":
+          description: Error interno
+
+
+
+  /auth/me:
+
+    get:
+      tags:
+        - Auth
+
+      summary: Obtener usuario autenticado
+
+      security:
+        - bearerAuth: []
+
+      responses:
+
+        "200":
+          description: Información del usuario
+
+          content:
+            application/json:
+
+              example:
+                success: true
+                data:
+                  id: 1
+                  name: Juan Perez
+                  email: juan@email.com
+                  createdAt: "2026-06-20T12:00:00.000Z"
+                  updatedAt: "2026-06-20T12:00:00.000Z"
+
+        "401":
+          description: Token requerido
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Requiere token
+
+        "403":
+          description: Token inválido
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Token inválido o expirado
+
+
+
+  /auth/logout:
+
+    post:
+      tags:
+        - Auth
+
+      summary: Cerrar sesión
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+
+            example:
+              refreshToken: eyJhbGciOi...
+
+      responses:
+
+        "200":
+          description: Logout exitoso
+
+          content:
+            application/json:
+
+              example:
+                success: true
+
+        "500":
+          description: Error interno
+
+
+
+  /auth/refresh:
+
+    post:
+      tags:
+        - Auth
+
+      summary: Obtener un nuevo Access Token
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+
+            example:
+              refreshToken: eyJhbGciOi...
+
+      responses:
+
+        "200":
+          description: Nuevo Access Token
+
+          content:
+            application/json:
+
+              example:
+                success: true
+                data:
+                  accessToken: eyJhbGciOi...
+
+        "400":
+          description: Refresh Token requerido
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Requiere refresh token
+
+        "401":
+          description: Refresh Token inválido o expirado
+
+          content:
+            application/json:
+
+              example:
+                success: false
+                message: Refresh token expirado
+
+        "500":
+          description: Error interno
+
 components:
+
+  securitySchemes:
+
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 
   schemas:
 
@@ -166,15 +786,23 @@ components:
 
         id:
           type: integer
+          example: 1
 
         name:
           type: string
+          example: Bohemian Rhapsody
 
         genre:
           type: string
+          example: Rock
 
         cover:
           type: string
+          example: https://image.jpg
+
+        artistId:
+          type: integer
+          example: 1
 
     SongInput:
 
@@ -183,6 +811,7 @@ components:
       required:
         - name
         - genre
+        - artistId
 
       properties:
 
@@ -201,3 +830,85 @@ components:
         artistId:
           type: integer
           example: 1
+
+    RegisterInput:
+
+      type: object
+
+      required:
+        - name
+        - email
+        - password
+
+      properties:
+
+        name:
+          type: string
+          example: Juan Perez
+
+        email:
+          type: string
+          format: email
+          example: juan@email.com
+
+        password:
+          type: string
+          format: password
+          example: "123456"
+
+    LoginInput:
+
+      type: object
+
+      required:
+        - email
+        - password
+
+      properties:
+
+        email:
+          type: string
+          format: email
+          example: juan@email.com
+
+        password:
+          type: string
+          format: password
+          example: "123456"
+
+    FavoriteInput:
+
+      type: object
+
+      required:
+        - songId
+
+      properties:
+
+        songId:
+          type: integer
+          example: 1
+
+    Success:
+
+      type: object
+
+      properties:
+
+        success:
+          type: boolean
+          example: true
+
+    Error:
+
+      type: object
+
+      properties:
+
+        success:
+          type: boolean
+          example: false
+
+        message:
+          type: string
+          example: Error interno del servidor

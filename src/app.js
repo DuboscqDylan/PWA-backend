@@ -334,7 +334,7 @@ app.post("/auth/refresh", async (req, res, next) => {
     if (!storedToken) {
       return res.status(401).json({
         success: false,
-        message: "Refresh token invalidoa",
+        message: "Refresh token invalido",
       });
     }
 
