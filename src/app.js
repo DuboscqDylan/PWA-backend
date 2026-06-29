@@ -10,7 +10,7 @@ import notFound from "./middlewares/notFound.js";
 import validateSong from "./middlewares/validateSong.js";
 import validateRegister from "./middlewares/validateRegister.js";
 import validateLogin from "./middlewares/validateLogin.js";
-import { generateToken } from "./utils/jws.js";
+import { generateAccessToken, generateRefreshToken } from "./utils/jwt.js";
 import auth from "./middlewares/auth.js";
 
 
