@@ -112,7 +112,7 @@ app.get("/favorites", auth, async (req, res, next) => {
 });
 
 app.post("/favorites", auth, async (req, res, next) => {
-  const { songId } = Number(req.body.songId);;
+  const songId = Number(req.body.songId);;
   if (!songId) {
     return res.status(400).json({
       success: false,
@@ -162,7 +162,7 @@ app.post("/favorites", auth, async (req, res, next) => {
 });
 
 app.delete("/favorites/:songId", auth, async (req, res, next) => {
-  const { songId } = Number(req.params.songId);
+  const songId= Number(req.params.songId);
   try {
     const favorite = await prisma.favorite.findFirst({
       where: {
