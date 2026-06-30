@@ -25,6 +25,18 @@ Prisma:
    npm install @prisma/adapter-pg pg
    npx prisma init
 ```
+Swagger:
+```bash 
+   npm install swagger-ui-express swagger-jsdoc
+```
+Bcrysptjs:
+```bash 
+   npm install bcryptjs
+```
+JWT (tokens):
+```bash 
+   npm install jsonwebtoken
+```
 
 3. Configurar variables de entorno:
 
@@ -76,10 +88,11 @@ PWA-backend/
 │   ├── schema.prisma
 │   └── migrations/
 ├── src/
+│   ├── config/
 │   ├── controllers/
 │   ├── lib/
 │   ├── middlewares/
-│   ├── routes/
+│   ├── utils/
 │   └── app.js
 ├── .env
 ├── package.json
@@ -97,6 +110,34 @@ PWA-backend/
 * Respuestas consistentes en formato JSON.
 * Soporte para CORS.
 
+## 🔐 Autenticación y usuarios (NUEVO)
+* Registro de usuarios (/auth/register)
+* Login de usuarios (/auth/login)
+* Logout (/auth/logout)
+* Endpoint de sesión actual (/auth/me)
+* Autenticación con JWT
+* Middleware de protección de rutas
+* Implementación de refresh token (BONUS)
+* Persistencia de sesión segura
+
+## 👤 Modelo de usuario (Prisma)
+* Creación de entidad User en Prisma
+* Relación entre:
+      User ↔ Favorites
+      User ↔ Songs (favoritos por usuario)
+
+## ❤️ Favoritos (refactorizado)
+* GET /favorites filtrado por usuario autenticado
+* POST /favorites/:id asociado a usuario
+* DELETE /favorites/:id por usuario
+* Relación correcta User–Favorites en base de datos
+
+## 🔒 Seguridad
+* Protección de endpoints con JWT middleware
+* Validación de token en requests privados
+* Control de acceso a rutas sensibles
+* Manejo de expiración de sesión con refresh token
+
 ## 📡 Endpoints principales
 
  ### Health Check
@@ -105,6 +146,14 @@ PWA-backend/
    GET /health
 ```
 
+### Auth
+```bash
+   POST /auth/register
+   POST /auth/login
+   POST /auth/logout
+   GET  /auth/me
+   POST /auth/refresh
+```
  ### Canciones
 
 ```bash
@@ -115,13 +164,19 @@ PWA-backend/
    DELETE /songs/:id
 ```
 
- ### Favoritos
+ ### Favoritos (por usuario)
 
 ```bash
    GET /favorites
    POST /favorites
    DELETE /favorites/:id
 ```
+## 🗄 Base de datos
+* Entidad User agregada
+* Relación con favoritos
+* Campos automáticos:
+      - createdAt
+      - updatedAt
 
 ## 🔒 Validaciones
 
@@ -136,23 +191,15 @@ Las operaciones de creación y actualización incluyen:
 El proyecto implementa:
 
 - Middleware global de errores.
-- Manejo de rutas inexistentes.
+- 404 para rutas inexistentes.
 - Respuestas de error consistentes.
 - Prevención de caídas del servidor ante errores controlados.
 
-## 🗄 Base de datos
-
-Las entidades incluyen los campos:
-
-- createdAt
-- updatedAt
-
-Los timestamps son gestionados automáticamente por Prisma para registrar la fecha de creación y última modificación de cada registro.
 
 ## 📷 Nuestra API
 
-<img src="docs/image.png" width="800">
-<img src="docs/image2.png" width="800">
+<img src="docs/images/image.png" width="800">
+<img src="docs/images/image2.png" width="800">
 
 ## 👩‍💻 Integrantes
     Cyntia Nasabun
@@ -163,12 +210,12 @@ Los timestamps son gestionados automáticamente por Prisma para registrar la fec
 
 ## 📎 Repositorio
 
-    👉 https://github.com/DuboscqDylan/PWA-backend.git
+    https://github.com/DuboscqDylan/PWA-backend.git
 
 ## 📎 Linear
 
-    👉 https://linear.app/pwa-cerda-duboscq/project/tp3-express-6f9dd05b9a8b/overview
+    https://linear.app/pwa-cerda-duboscq/project/tp3-express-6f9dd05b9a8b/overview
 
 ## 📎 Vercel
 
-    👉 https://react-tp2-grupo16.vercel.app/
+    https://react-tp2-grupo16.vercel.app/
